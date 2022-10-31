@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 15000;
 
@@ -44,6 +44,61 @@ const run = async () => {
       const cursor = productsCollection.find(query);
       const productsData = await cursor.toArray();
       res.send(productsData);
+    });
+
+    app.delete("/delete/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const query = { _id: ObjectId(id) };
+
+      const result = await productsCollection.deleteOne(query);
+      console.log(result);
+      console.log("deleted");
+      res.send(result);
+    });
+
+    // ** get data from DB for update operation
+
+    app.get("/update/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: ObjectId(id),
+      };
+      const product = await productsCollection.findOne(query);
+      console.log(product);
+      console.log("single product data retrived");
+      res.send(product);
+    });
+
+    app.put("/product/update/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedProduct = req.body;
+
+      const { productName, quantity, price, picture } = updatedProduct;
+
+      const filter = {
+        _id: ObjectId(id),
+      };
+
+      const options = { upsert: true };
+      const product = {
+        $set: {
+          productName,
+          price,
+          quantity,
+          picture,
+        },
+      };
+
+      const result = await productsCollection.updateOne(
+        filter,
+        product,
+        options
+      );
+
+      console.log(result);
+      console.log("data Updated");
+      res.send(result);
     });
   } finally {
   }
