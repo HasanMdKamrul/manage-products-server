@@ -34,10 +34,16 @@ const run = async () => {
 
     app.post("/add", async (req, res) => {
       const productsInfo = req.body;
-
       const result = await productsCollection.insertOne(productsInfo);
       console.log(result);
       res.send(result);
+    });
+
+    app.get("/add", async (req, res) => {
+      const query = {};
+      const cursor = productsCollection.find(query);
+      const productsData = await cursor.toArray();
+      res.send(productsData);
     });
   } finally {
   }
