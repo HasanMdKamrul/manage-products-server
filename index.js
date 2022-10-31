@@ -25,12 +25,25 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
-client.connect((err) => {
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  console.log("db connected");
-  client.close();
-});
+
+const run = async () => {
+  try {
+    const productsCollection = client
+      .db("productsManagement")
+      .collection("products");
+
+    app.post("/add", async (req, res) => {
+      const productsInfo = req.body;
+
+      const result = await productsCollection.insertOne(productsInfo);
+      console.log(result);
+      res.send(result);
+    });
+  } finally {
+  }
+};
+
+run().catch((e) => console.log(e));
 
 // ** app listen to the port
 
